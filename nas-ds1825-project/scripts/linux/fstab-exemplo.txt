@@ -1,0 +1,21 @@
+# Exemplo de montagem persistente via /etc/fstab no Linux.
+#
+# 1) Criar arquivo de credenciais protegido (NUNCA colocar a senha direto no fstab):
+#      sudo tee /etc/nas-credentials > /dev/null <<'EOF'
+#      username=usuarioNN
+#      password=SENHA_AQUI
+#      domain=WORKGROUP
+#      EOF
+#      sudo chmod 600 /etc/nas-credentials
+#
+# 2) Adicionar as linhas abaixo ao final de /etc/fstab (ajustar host, share, uid/gid):
+#
+# //nas-central/Publico       /mnt/nas/Publico       cifs  credentials=/etc/nas-credentials,vers=3.0,uid=1000,gid=1000,iocharset=utf8,x-systemd.automount,_netdev  0  0
+# //nas-central/Departamentos /mnt/nas/Departamentos cifs  credentials=/etc/nas-credentials,vers=3.0,uid=1000,gid=1000,iocharset=utf8,x-systemd.automount,_netdev  0  0
+# //nas-central/Usuarios/usuarioNN /mnt/nas/usuarioNN cifs credentials=/etc/nas-credentials,vers=3.0,uid=1000,gid=1000,iocharset=utf8,x-systemd.automount,_netdev  0  0
+#
+# 3) Criar os pontos de montagem e testar:
+#      sudo mkdir -p /mnt/nas/Publico /mnt/nas/Departamentos /mnt/nas/usuarioNN
+#      sudo mount -a
+#
+# x-systemd.automount evita travar o boot caso o NAS esteja offline.
