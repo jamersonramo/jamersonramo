@@ -1,4 +1,5 @@
 const repo = require('./db/repo');
+const { parseCookies, COOKIE_NAME } = require('./middleware/cookies');
 
 // Cada sessao tem duas salas: uma para o painel (ve tudo, inclusive pendentes)
 // e outra publica, compartilhada por telao e participantes (so ve o que foi moderado).
@@ -15,7 +16,7 @@ function buildSnapshot(session, role) {
   const questions =
     role === 'painel'
       ? repo.listQuestions(session.id)
-      : repo.listQuestions(session.id, PUBLIC_STATUSES);
+      : repo.listQuestions(session.id, { status: PUBLIC_STATUSES });
   return { session, questions };
 }
 
@@ -29,7 +30,12 @@ function initSocket(io) {
         return;
       }
 
-      const safeRole = role === 'painel' ? 'painel' : 'public';
+      // "painel" so e concedido se o cookie de sessao do socket corresponder a um editor logado;
+      // caso contrario o cliente cai para "public" mesmo que peca role:'painel' (evita vazar
+      // perguntas pendentes/rejeitadas para quem nao esta autenticado).
+      const cookies = parseCookies(socket.handshake.headers.cookie);
+      const editor = repo.getEditorBySessionToken(cookies[COOKIE_NAME]);
+      const safeRole = role === 'painel' && editor ? 'painel' : 'public';
       socket.data.code = session.code;
       socket.data.role = safeRole;
       socket.join(safeRole === 'painel' ? painelRoom(session.code) : publicRoom(session.code));

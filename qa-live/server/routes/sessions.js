@@ -2,6 +2,7 @@ const express = require('express');
 const QRCode = require('qrcode');
 const repo = require('../db/repo');
 const { emitSessionState } = require('../socket');
+const requireEditor = require('../middleware/requireEditor');
 
 function buildUrls(req, code) {
   const base = `${req.protocol}://${req.get('host')}`;
@@ -15,8 +16,8 @@ function buildUrls(req, code) {
 module.exports = function sessionsRouter(io) {
   const router = express.Router();
 
-  // Cria uma nova sessao (Painel).
-  router.post('/sessions', (req, res) => {
+  // Cria uma nova sessao (Painel, requer editor logado).
+  router.post('/sessions', requireEditor, (req, res) => {
     const title = String(req.body?.title || '').trim();
     if (!title) return res.status(400).json({ error: 'title_required' });
     if (title.length > 120) return res.status(400).json({ error: 'title_too_long' });
@@ -39,8 +40,8 @@ module.exports = function sessionsRouter(io) {
     return res.json({ session, ...urls, qr_code });
   });
 
-  // Muda status da sessao: draft -> live -> ended (Painel).
-  router.post('/sessions/:code/status', (req, res) => {
+  // Muda status da sessao: draft -> live -> ended (Painel, requer editor logado).
+  router.post('/sessions/:code/status', requireEditor, (req, res) => {
     const status = req.body?.status;
     if (!['draft', 'live', 'ended'].includes(status)) {
       return res.status(400).json({ error: 'invalid_status' });

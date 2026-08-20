@@ -4,15 +4,19 @@ const http = require('node:http');
 const { Server } = require('socket.io');
 
 const { initSocket } = require('./socket');
+const { attachCookies } = require('./middleware/cookies');
 const sessionsRouter = require('./routes/sessions');
 const questionsRouter = require('./routes/questions');
+const authRouter = require('./routes/auth');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
 app.use(express.json());
+app.use(attachCookies);
 
+app.use('/api', authRouter());
 app.use('/api', sessionsRouter(io));
 app.use('/api', questionsRouter(io));
 

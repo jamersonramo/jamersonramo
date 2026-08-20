@@ -1,4 +1,4 @@
-# Palco Q&A — MVP de interação com o público
+# Estúdios Bradesco Interações — MVP de interação com o público
 
 MVP de Q&A com moderação para eventos ao vivo (telão do produtor + celular do
 público), implementado a partir do briefing técnico do projeto. Identidade
@@ -16,12 +16,14 @@ Três rotas independentes, servidas pelo mesmo servidor:
 
 | Tela | Rota | Papel |
 |---|---|---|
-| Painel | `/painel` (depois `/painel/:codigo`) | Produtor: cria a sessão, modera a fila, controla o que vai pro telão. |
+| Painel | `/painel` (depois `/painel/:codigo`) | Produtor/editor autenticado: cria a sessão, modera a fila, controla o que vai pro telão. |
 | Telão | `/telao/:codigo` | Somente exibição — sem nenhum controle. Pensada para ser capturada como fonte de tela/navegador no OBS/vMix. |
 | Participante | `/entrar` → `/participante/:codigo` | Mobile-first. Sem cadastro: entra com o código de 6 dígitos ou QR code. |
 
 ## Fluxo
 
+0. Produtor faz login em `/painel` com e-mail e senha de editor (ver
+   [Autenticação do editor](#autenticação-do-editor) abaixo).
 1. Produtor cria a sessão no Painel → recebe código de 6 dígitos + QR code.
 2. Produtor abre `/telao/:codigo` numa janela/fonte separada.
 3. Produtor clica **Iniciar sessão** (a sessão vai de `draft` para `live` —
@@ -62,6 +64,40 @@ Máquina de estados da pergunta: `pending → approved/rejected`,
   tela em `public/<tela>/`, com um `public/shared/` para CSS/JS comuns
   (fingerprint, chamada de API, toast).
 
+## Autenticação do editor
+
+O Painel exige login (e-mail + senha) antes de criar sessões ou moderar
+perguntas — sem isso, qualquer pessoa com o link `/painel/:codigo` poderia
+moderar. Detalhes:
+
+- Senha nunca é armazenada em texto puro: é derivada com `scrypt` (módulo
+  nativo `node:crypto`, sem dependência externa) e só o hash fica no banco
+  (`server/auth.js`). O código-fonte também não contém nenhuma senha —
+  contas são criadas por um script que lê as credenciais de variáveis de
+  ambiente.
+- Sessão de login usa um cookie `HttpOnly` assinado por um token aleatório
+  (`server/middleware/cookies.js`), válido por 30 dias, armazenado na tabela
+  `editor_sessions`.
+- As rotas de escrita do produtor (`POST /api/sessions`, mudar status da
+  sessão, listar/moderar perguntas) exigem o cookie válido
+  (`server/middleware/requireEditor.js`). O envio de pergunta e o upvote do
+  público continuam sem login, como esperado.
+- No Socket.IO, a sala `session:{codigo}:painel` (que expõe perguntas
+  pendentes/rejeitadas) só é concedida se o handshake do socket trouxer um
+  cookie de editor válido — um cliente não pode simplesmente pedir
+  `role: 'painel'` para ver a fila de moderação sem estar autenticado.
+
+Para criar ou atualizar a senha de um editor:
+
+```bash
+cd qa-live
+EDITOR_EMAIL="voce@empresa.com" EDITOR_PASSWORD="sua-senha" npm run create-editor
+```
+
+O e-mail e a senha nunca ficam no repositório — passe-os apenas na hora de
+rodar o comando (variáveis de ambiente do próprio shell, ou de um `.env`
+local que também deve ficar fora do git).
+
 ## Modelo de dados
 
 Ver `server/db/index.js`. Implementado nesta entrega: `sessions`,
@@ -78,9 +114,9 @@ npm install
 npm start          # ou: npm run dev (com --watch)
 ```
 
-Acesse `http://localhost:3000`:
+Crie sua conta de editor (ver seção abaixo) e acesse `http://localhost:3000`:
 
-- `/painel` — criar/gerenciar uma sessão.
+- `/painel` — login e criação/gerenciamento de uma sessão.
 - `/telao/<codigo>` — abrir numa segunda janela/fonte de captura.
 - `/entrar` — simular o acesso do público.
 
@@ -93,6 +129,6 @@ o QR code e o link do participante funcionarem no celular do público.
    de eventos `poll:started` / `poll:vote` / `poll:results`.
 2. **Nuvem de palavras** — mesma ideia, com agregação de contagem por
    palavra no servidor.
-3. Autenticação simples do produtor (hoje qualquer um com o link `/painel/:codigo`
-   modera — ok para MVP de uso único, mas vale revisar antes de produção).
+3. Mais de um editor por conta/organização, com papéis diferentes (hoje é
+   uma tabela simples de editores, sem multi-tenant).
 4. Customização de tema por sessão (`theme_id` já reservado no modelo).

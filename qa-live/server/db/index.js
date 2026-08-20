@@ -33,6 +33,20 @@ db.exec(`
     participant_fingerprint TEXT NOT NULL,
     UNIQUE(question_id, participant_fingerprint)
   );
+
+  CREATE TABLE IF NOT EXISTS editors (
+    id TEXT PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS editor_sessions (
+    token TEXT PRIMARY KEY,
+    editor_id TEXT NOT NULL REFERENCES editors(id),
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL
+  );
 `);
 
 module.exports = db;

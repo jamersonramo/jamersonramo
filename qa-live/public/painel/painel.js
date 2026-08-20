@@ -3,6 +3,7 @@
   let state = { session: null, questions: [] };
   let socket = null;
 
+  const loginScreen = document.getElementById('login-screen');
   const createScreen = document.getElementById('create-screen');
   const panelScreen = document.getElementById('panel-screen');
 
@@ -10,7 +11,25 @@
     return codeFromPath() || localStorage.getItem(STORAGE_KEY) || '';
   }
 
+  function hideAllScreens() {
+    loginScreen.hidden = true;
+    createScreen.hidden = true;
+    panelScreen.hidden = true;
+  }
+
   async function boot() {
+    hideAllScreens();
+    let editor;
+    try {
+      const me = await api('/auth/me');
+      editor = me.editor;
+    } catch (err) {
+      loginScreen.hidden = false;
+      return;
+    }
+
+    document.getElementById('editor-email').textContent = editor.email;
+
     const code = currentCode();
     if (!code) {
       createScreen.hidden = false;
@@ -158,12 +177,41 @@
   });
 
   document.getElementById('btn-start').addEventListener('click', async () => {
-    await api(`/sessions/${state.session.code}/status`, { method: 'POST', body: { status: 'live' } });
+    try {
+      await api(`/sessions/${state.session.code}/status`, { method: 'POST', body: { status: 'live' } });
+    } catch (err) {
+      showToast('Não foi possível iniciar a sessão');
+    }
   });
 
   document.getElementById('btn-end').addEventListener('click', async () => {
     if (!confirm('Encerrar a sessão? O código deixará de aceitar novas perguntas.')) return;
-    await api(`/sessions/${state.session.code}/status`, { method: 'POST', body: { status: 'ended' } });
+    try {
+      await api(`/sessions/${state.session.code}/status`, { method: 'POST', body: { status: 'ended' } });
+    } catch (err) {
+      showToast('Não foi possível encerrar a sessão');
+    }
+  });
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errorEl = document.getElementById('login-error');
+    errorEl.textContent = '';
+    try {
+      await api('/auth/login', { method: 'POST', body: { email, password } });
+      boot();
+    } catch (err) {
+      errorEl.textContent = 'E-mail ou senha inválidos.';
+    }
+  });
+
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    if (socket) socket.disconnect();
+    await api('/auth/logout', { method: 'POST' }).catch(() => {});
+    localStorage.removeItem(STORAGE_KEY);
+    window.location.href = '/painel';
   });
 
   boot();

@@ -114,6 +114,49 @@ function addUpvote(questionId, fingerprint) {
   return { question: getQuestionById(questionId) };
 }
 
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
+
+function createEditor(email, passwordHash) {
+  const id = crypto.randomUUID();
+  const created_at = new Date().toISOString();
+  db.prepare(
+    `INSERT INTO editors (id, email, password_hash, created_at) VALUES (?, ?, ?, ?)`
+  ).run(id, email.toLowerCase(), passwordHash, created_at);
+  return getEditorByEmail(email);
+}
+
+function getEditorByEmail(email) {
+  return (
+    db.prepare(`SELECT * FROM editors WHERE email = ?`).get(String(email).toLowerCase()) || null
+  );
+}
+
+function getEditorById(id) {
+  return db.prepare(`SELECT * FROM editors WHERE id = ?`).get(id) || null;
+}
+
+function createEditorSession(editorId) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const now = Date.now();
+  db.prepare(
+    `INSERT INTO editor_sessions (token, editor_id, created_at, expires_at) VALUES (?, ?, ?, ?)`
+  ).run(token, editorId, new Date(now).toISOString(), new Date(now + SESSION_TTL_MS).toISOString());
+  return token;
+}
+
+function getEditorBySessionToken(token) {
+  if (!token) return null;
+  const row = db
+    .prepare(`SELECT * FROM editor_sessions WHERE token = ? AND expires_at > ?`)
+    .get(token, new Date().toISOString());
+  if (!row) return null;
+  return getEditorById(row.editor_id);
+}
+
+function deleteEditorSession(token) {
+  db.prepare(`DELETE FROM editor_sessions WHERE token = ?`).run(token);
+}
+
 module.exports = {
   createSession,
   getSessionByCode,
@@ -125,4 +168,10 @@ module.exports = {
   updateQuestionStatus,
   addUpvote,
   VALID_STATUSES,
+  createEditor,
+  getEditorByEmail,
+  getEditorById,
+  createEditorSession,
+  getEditorBySessionToken,
+  deleteEditorSession,
 };

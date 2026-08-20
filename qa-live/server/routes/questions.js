@@ -5,14 +5,15 @@ const {
   emitQuestionStatusChanged,
   emitQuestionUpvoted,
 } = require('../socket');
+const requireEditor = require('../middleware/requireEditor');
 
 const MAX_LENGTH = 280;
 
 module.exports = function questionsRouter(io) {
   const router = express.Router();
 
-  // Lista perguntas de uma sessao. ?status=approved,highlighted,answered filtra.
-  router.get('/sessions/:code/questions', (req, res) => {
+  // Lista perguntas de uma sessao (fila de moderacao completa: requer editor logado).
+  router.get('/sessions/:code/questions', requireEditor, (req, res) => {
     const session = repo.getSessionByCode(req.params.code);
     if (!session) return res.status(404).json({ error: 'not_found' });
 
@@ -38,8 +39,8 @@ module.exports = function questionsRouter(io) {
     return res.status(201).json({ question });
   });
 
-  // Painel modera: approved | rejected | highlighted | answered.
-  router.post('/sessions/:code/questions/:id/status', (req, res) => {
+  // Painel modera: approved | rejected | highlighted | answered (requer editor logado).
+  router.post('/sessions/:code/questions/:id/status', requireEditor, (req, res) => {
     const session = repo.getSessionByCode(req.params.code);
     if (!session) return res.status(404).json({ error: 'not_found' });
 
@@ -50,7 +51,7 @@ module.exports = function questionsRouter(io) {
 
     const previouslyHighlighted =
       req.body?.status === 'highlighted'
-        ? repo.listQuestions(session.id, ['highlighted']).filter((q) => q.id !== question.id)
+        ? repo.listQuestions(session.id, { status: ['highlighted'] }).filter((q) => q.id !== question.id)
         : [];
 
     const updated = repo.updateQuestionStatus(req.params.id, req.body?.status);

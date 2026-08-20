@@ -3,15 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Painel · Palco Q&amp;A</title>
+  <title>Painel · Estúdios Bradesco Interações</title>
   <link rel="stylesheet" href="/shared/base.css" />
   <link rel="stylesheet" href="/painel/painel.css" />
 </head>
 <body>
+  <!-- Tela de login, exibida quando não há editor autenticado -->
+  <div id="login-screen" class="center-screen" hidden>
+    <div class="card" style="width:min(380px, 92vw);">
+      <div class="brand" style="margin-bottom:18px;">Bradesco<span class="dot">Interações</span></div>
+      <h1 style="font-size:20px; margin-top:0;">Entrar como editor</h1>
+      <form id="login-form">
+        <label class="muted" style="font-size:13px;">E-mail</label>
+        <input id="login-email" type="email" required style="width:100%; margin:8px 0 14px;" />
+        <label class="muted" style="font-size:13px;">Senha</label>
+        <input id="login-password" type="password" required style="width:100%; margin:8px 0 16px;" />
+        <button class="btn btn-primary" type="submit" style="width:100%;">Entrar</button>
+      </form>
+      <p id="login-error" class="muted" style="color:var(--danger); min-height:20px;"></p>
+    </div>
+  </div>
+
   <!-- Tela de criação, exibida quando ainda não há sessão -->
   <div id="create-screen" class="center-screen" hidden>
     <div class="card" style="width:min(420px, 92vw);">
-      <div class="brand" style="margin-bottom:18px;">Palco<span class="dot">Q&amp;A</span></div>
+      <div class="brand" style="margin-bottom:18px;">Bradesco<span class="dot">Interações</span></div>
       <h1 style="font-size:20px; margin-top:0;">Nova sessão</h1>
       <form id="create-form">
         <label class="muted" style="font-size:13px;">Título do evento</label>
@@ -25,7 +41,7 @@
   <!-- Painel principal, exibido quando há sessão ativa -->
   <div id="panel-screen" hidden>
     <header class="topbar">
-      <div class="brand">Palco<span class="dot">Q&amp;A</span></div>
+      <div class="brand">Bradesco<span class="dot">Interações</span></div>
       <div class="session-info">
         <span id="session-title" class="muted"></span>
         <span id="session-status" class="badge badge-pending"></span>
@@ -33,6 +49,8 @@
       <div class="topbar-actions">
         <button id="btn-start" class="btn btn-primary">Iniciar sessão</button>
         <button id="btn-end" class="btn btn-danger" hidden>Encerrar sessão</button>
+        <span id="editor-email" class="muted" style="font-size:13px;"></span>
+        <button id="btn-logout" class="btn">Sair</button>
       </div>
     </header>
 
