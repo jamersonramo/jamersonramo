@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Entrar · Palco Q&amp;A</title>
+  <link rel="stylesheet" href="/shared/base.css" />
+  <style>
+    .code-input {
+      width: 100%;
+      font-size: 28px;
+      letter-spacing: .3em;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+  <div class="center-screen">
+    <div class="card" style="width:min(360px, 92vw); text-align:center;">
+      <div class="brand" style="justify-content:center; margin-bottom:18px;">Palco<span class="dot">Q&amp;A</span></div>
+      <p class="muted" style="margin-top:0;">Digite o código exibido no telão</p>
+      <form id="join-form">
+        <input id="code-input" class="code-input" type="text" inputmode="numeric" pattern="[0-9]*"
+               maxlength="6" placeholder="000000" autofocus style="margin:12px 0 16px;" />
+        <button class="btn btn-primary" type="submit" style="width:100%;">Entrar</button>
+      </form>
+      <p id="error-msg" class="muted" style="color:var(--danger); min-height:20px;"></p>
+    </div>
+  </div>
+
+  <script src="/shared/api.js"></script>
+  <script src="/entrar/entrar.js"></script>
+</body>
+</html>

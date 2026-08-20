@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Participante · Palco Q&amp;A</title>
+  <link rel="stylesheet" href="/shared/base.css" />
+  <link rel="stylesheet" href="/participante/participante.css" />
+</head>
+<body>
+  <header class="p-header">
+    <div class="brand">Palco<span class="dot">Q&amp;A</span></div>
+    <span id="session-title" class="muted"></span>
+  </header>
+
+  <div id="not-live-banner" class="banner" hidden></div>
+
+  <main class="p-main">
+    <form id="ask-form" class="card ask-card">
+      <textarea id="question-input" maxlength="280" rows="3" placeholder="Escreva sua pergunta..."></textarea>
+      <div class="ask-footer">
+        <span id="char-count" class="muted">0/280</span>
+        <button id="ask-submit" class="btn btn-primary" type="submit">Enviar pergunta</button>
+      </div>
+    </form>
+
+    <h2 class="section-title">Perguntas aprovadas</h2>
+    <div id="question-list" class="q-list"></div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/shared/api.js"></script>
+  <script src="/participante/participante.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Telão · Palco Q&amp;A</title>
+  <link rel="stylesheet" href="/shared/base.css" />
+  <link rel="stylesheet" href="/telao/telao.css" />
+</head>
+<body>
+  <!-- Somente exibição: sem controles de moderação. Pensado para ser capturado via OBS/vMix. -->
+
+  <div id="waiting-screen" class="screen" hidden>
+    <div class="brand" style="font-size:32px;">Palco<span class="dot">Q&amp;A</span></div>
+    <p class="muted" id="waiting-title" style="font-size:20px;"></p>
+    <div class="waiting-body">
+      <img id="qr-code" alt="QR code de acesso" />
+      <div class="waiting-code">
+        <div class="muted">Entre com o código</div>
+        <div id="session-code" class="code"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="highlight-screen" class="screen" hidden>
+    <div class="brand small">Palco<span class="dot">Q&amp;A</span></div>
+    <div id="highlight-text" class="highlight-text"></div>
+  </div>
+
+  <div id="ranking-screen" class="screen" hidden>
+    <div class="brand small">Palco<span class="dot">Q&amp;A</span></div>
+    <h1 class="ranking-heading">Perguntas em alta</h1>
+    <div id="ranking-list" class="ranking-list"></div>
+    <div class="ranking-footer">
+      <span class="muted">Envie a sua em</span>
+      <span id="session-code-small" class="code small"></span>
+    </div>
+  </div>
+
+  <div id="ended-screen" class="screen" hidden>
+    <div class="brand" style="font-size:32px;">Palco<span class="dot">Q&amp;A</span></div>
+    <p class="muted" style="font-size:20px;">Sessão encerrada. Obrigado!</p>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/shared/api.js"></script>
+  <script src="/telao/telao.js"></script>
+</body>
+</html>

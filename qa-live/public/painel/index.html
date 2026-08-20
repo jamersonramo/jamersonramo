@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel · Palco Q&amp;A</title>
+  <link rel="stylesheet" href="/shared/base.css" />
+  <link rel="stylesheet" href="/painel/painel.css" />
+</head>
+<body>
+  <!-- Tela de criação, exibida quando ainda não há sessão -->
+  <div id="create-screen" class="center-screen" hidden>
+    <div class="card" style="width:min(420px, 92vw);">
+      <div class="brand" style="margin-bottom:18px;">Palco<span class="dot">Q&amp;A</span></div>
+      <h1 style="font-size:20px; margin-top:0;">Nova sessão</h1>
+      <form id="create-form">
+        <label class="muted" style="font-size:13px;">Título do evento</label>
+        <input id="title-input" type="text" placeholder="Ex.: Live de lançamento" maxlength="120" required
+               style="width:100%; margin:8px 0 16px;" />
+        <button class="btn btn-primary" type="submit" style="width:100%;">Criar sessão</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Painel principal, exibido quando há sessão ativa -->
+  <div id="panel-screen" hidden>
+    <header class="topbar">
+      <div class="brand">Palco<span class="dot">Q&amp;A</span></div>
+      <div class="session-info">
+        <span id="session-title" class="muted"></span>
+        <span id="session-status" class="badge badge-pending"></span>
+      </div>
+      <div class="topbar-actions">
+        <button id="btn-start" class="btn btn-primary">Iniciar sessão</button>
+        <button id="btn-end" class="btn btn-danger" hidden>Encerrar sessão</button>
+      </div>
+    </header>
+
+    <section class="access-card card">
+      <div>
+        <div class="muted" style="font-size:13px;">Código de acesso</div>
+        <div id="session-code" class="code"></div>
+      </div>
+      <img id="qr-code" alt="QR code de acesso" />
+      <div class="access-links">
+        <a id="link-telao" class="btn" target="_blank">Abrir Telão ↗</a>
+        <a id="link-participante" class="btn" target="_blank">Link do participante ↗</a>
+      </div>
+    </section>
+
+    <main class="columns">
+      <section class="column">
+        <h2>Fila de moderação <span id="count-pending" class="muted"></span></h2>
+        <div id="pending-list" class="list"></div>
+      </section>
+
+      <section class="column">
+        <h2>Aprovadas / no ar <span id="count-approved" class="muted"></span></h2>
+        <div id="approved-list" class="list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/shared/api.js"></script>
+  <script src="/painel/painel.js"></script>
+</body>
+</html>
