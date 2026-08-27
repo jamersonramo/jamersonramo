@@ -224,7 +224,15 @@ ipcMain.handle('settings:reset', () => {
 ipcMain.handle('network:toggle', async (_event, enable) => {
   if (enable) {
     if (network) return { enabled: true, url: network.url };
-    network = await startServer(state);
+    network = await startServer(state, {
+      // Qualquer cliente de rede (tablet/celular) pode enviar atualizações
+      // de estado ou comandos, passando pelo mesmo caminho usado pelo
+      // controle desktop e pelos atalhos globais — controle bidirecional.
+      onMessage: (message) => {
+        if (message.kind === 'state') broadcastAll(message.payload);
+        if (message.kind === 'command') sendCommand(message.payload);
+      },
+    });
     return { enabled: true, url: network.url };
   }
   stopServer(network);

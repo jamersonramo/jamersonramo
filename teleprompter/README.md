@@ -15,9 +15,14 @@ App desktop de teleprompter (Electron) com:
   - Cada ação (play/pause, velocidade, avançar/voltar, reiniciar, espelhar)
     pode ser vinculada a qualquer tecla ou botão pela própria interface,
     na seção "Controle remoto" da janela de controle.
-- Mirror de rede: liga um servidor local que qualquer tablet/celular na
-  mesma Wi-Fi pode abrir no navegador, para montar um rig de gravação com
-  câmera móvel sem precisar de um segundo monitor físico.
+- Mirror de rede **bidirecional**: liga um servidor local que qualquer
+  tablet/celular na mesma Wi-Fi pode abrir no navegador. A página tem um
+  botão ⚙ que alterna entre modo espelho (tela cheia) e modo controle
+  (editor + play/pause) — qualquer aparelho conectado pode virar controle
+  ou espelho a qualquer momento, inclusive vários ao mesmo tempo.
+- Modo **P2P sem notebook** (`mobile-webrtc/`): página web independente
+  que conecta dois celulares/tablets diretamente entre si via WebRTC,
+  sem precisar do app desktop rodando. Veja `mobile-webrtc/README.md`.
 
 ## Requisitos
 
@@ -70,12 +75,14 @@ teleprompter/
     server.js               servidor local (Express + WebSocket) do mirror de rede
     settings-store.js        persistência dos vínculos de controle remoto
     renderer/
-      control/               janela de controle (editor + painel)
+      control/               janela de controle desktop (editor + painel)
       display/                janela de exibição (Electron, tela cheia/segunda tela)
-      network/                página servida na rede local para tablets/celulares
+      network/                página bidirecional (espelho + controle) servida na Wi-Fi
       shared/
-        scroll-engine.js       motor de rolagem usado por display/ e network/
-        remote-control.js      captura/leitura de teclado e Gamepad API
+        scroll-engine.js       motor de rolagem usado por display/, network/ e mobile-webrtc/
+        mobile-app.js           UI espelho+controle reaproveitada por network/ e mobile-webrtc/
+        remote-control.js      captura/leitura de teclado e Gamepad API (app desktop)
+  mobile-webrtc/            página estática independente, P2P entre dois celulares (sem notebook)
 ```
 
 ## Como funciona a sincronização

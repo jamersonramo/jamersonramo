@@ -1,31 +1,27 @@
-const engine = ScrollEngine.create({ textEl: document.getElementById('text') });
-const statusEl = document.getElementById('status');
+const transport = WsTransport.create();
 
-function connect() {
-  const ws = new WebSocket(`ws://${location.host}`);
+MobileApp.init({
+  transport,
+  elements: {
+    stageTextEl: document.getElementById('text'),
+    scriptEl: document.getElementById('m-script'),
+    speedInput: document.getElementById('m-speed'),
+    speedValue: document.getElementById('m-speed-value'),
+    fontSizeInput: document.getElementById('m-font-size'),
+    fontSizeValue: document.getElementById('m-font-size-value'),
+    mirroredInput: document.getElementById('m-mirrored'),
+    playBtn: document.getElementById('m-play'),
+    resetBtn: document.getElementById('m-reset'),
+    importInput: document.getElementById('m-import'),
+    statusEl: document.getElementById('status'),
+    modeMirrorBtn: document.getElementById('mode-mirror-btn'),
+    modeControlBtn: document.getElementById('mode-control-btn'),
+  },
+});
 
-  ws.addEventListener('open', () => {
-    statusEl.textContent = 'conectado';
-  });
-
-  ws.addEventListener('message', (event) => {
-    const message = JSON.parse(event.data);
-    if (message.kind === 'state') engine.setState(message.payload);
-    if (message.kind === 'command') engine.applyCommand(message.payload);
-  });
-
-  ws.addEventListener('close', () => {
-    statusEl.textContent = 'desconectado — tentando reconectar...';
-    setTimeout(connect, 1500);
-  });
-
-  ws.addEventListener('error', () => ws.close());
-}
-
-connect();
-
-// Toque duplo alterna tela cheia — útil em tablets/celulares presos no rig.
-document.addEventListener('dblclick', () => {
+// Toque duplo na tela de espelho alterna tela cheia — útil em
+// tablets/celulares presos no rig.
+document.querySelector('.stage').addEventListener('dblclick', () => {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch(() => {});
   } else {

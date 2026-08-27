@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Teleprompter P2P</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="mode-mirror">
+  <section id="pairing-screen" class="pairing">
+    <h1>Teleprompter P2P</h1>
+    <p class="muted">
+      Conecta dois aparelhos (ex: iPad e iPhone) diretamente pela internet,
+      sem precisar de notebook. Qualquer um dos dois pode virar o controle
+      ou o espelho depois de conectar.
+    </p>
+
+    <div class="pairing-actions">
+      <button id="host-btn" class="big">Criar sessão</button>
+      <button id="join-btn" class="big">Entrar em uma sessão</button>
+    </div>
+
+    <div id="code-display" class="code-display hidden"></div>
+
+    <div id="join-form" class="join-form hidden">
+      <input id="join-code-input" type="text" maxlength="5" placeholder="Código de 5 letras" autocapitalize="characters" />
+      <button id="join-connect-btn">Conectar</button>
+    </div>
+
+    <p id="pairing-status" class="muted"></p>
+  </section>
+
+  <section id="app-screen" class="hidden">
+    <div class="stage">
+      <div class="text-wrap">
+        <p id="text" class="text"></p>
+      </div>
+      <div class="center-line"></div>
+      <button id="mode-control-btn" class="mode-fab" title="Virar controle">⚙</button>
+    </div>
+
+    <div class="control-panel">
+      <header>
+        <h1>Teleprompter</h1>
+        <div class="header-actions">
+          <button id="mode-mirror-btn">Virar espelho</button>
+          <button id="disconnect-btn">Desconectar</button>
+        </div>
+      </header>
+
+      <textarea id="m-script" placeholder="Cole ou digite o roteiro aqui..."></textarea>
+
+      <label class="field">
+        <input type="file" id="m-import" accept=".txt,.md" />
+        Importar roteiro (.txt/.md)
+      </label>
+
+      <div class="transport">
+        <button id="m-play" class="big">▶ Reproduzir</button>
+        <button id="m-reset">⏮ Reiniciar</button>
+      </div>
+
+      <label class="field">
+        Velocidade: <span id="m-speed-value">60</span> px/s
+        <input type="range" id="m-speed" min="0" max="400" value="60" />
+      </label>
+
+      <label class="field">
+        Tamanho da fonte: <span id="m-font-size-value">48</span> px
+        <input type="range" id="m-font-size" min="24" max="120" value="48" />
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" id="m-mirrored" />
+        Espelhar texto
+      </label>
+
+      <p id="status" class="muted"></p>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="scroll-engine.js"></script>
+  <script src="mobile-app.js"></script>
+  <script src="webrtc-transport.js"></script>
+  <script src="pairing.js"></script>
+</body>
+</html>

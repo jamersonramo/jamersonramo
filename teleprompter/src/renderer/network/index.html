@@ -5,26 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Teleprompter — Mirror</title>
   <link rel="stylesheet" href="/display/display.css" />
-  <style>
-    #status {
-      position: fixed;
-      bottom: 8px;
-      right: 12px;
-      color: rgba(255, 255, 255, 0.25);
-      font-family: monospace;
-      font-size: 12px;
-    }
-  </style>
+  <link rel="stylesheet" href="/network/network.css" />
 </head>
-<body>
+<body class="mode-mirror">
   <div class="stage">
     <div class="text-wrap">
       <p id="text" class="text"></p>
     </div>
     <div class="center-line"></div>
+    <button id="mode-control-btn" class="mode-fab" title="Virar controle">⚙</button>
   </div>
-  <div id="status">conectando...</div>
+
+  <div class="control-panel">
+    <header>
+      <h1>Teleprompter</h1>
+      <button id="mode-mirror-btn">Virar espelho</button>
+    </header>
+
+    <textarea id="m-script" placeholder="Cole ou digite o roteiro aqui..."></textarea>
+
+    <label class="field">
+      <input type="file" id="m-import" accept=".txt,.md" />
+      Importar roteiro (.txt/.md)
+    </label>
+
+    <div class="transport">
+      <button id="m-play" class="big">▶ Reproduzir</button>
+      <button id="m-reset">⏮ Reiniciar</button>
+    </div>
+
+    <label class="field">
+      Velocidade: <span id="m-speed-value">60</span> px/s
+      <input type="range" id="m-speed" min="0" max="400" value="60" />
+    </label>
+
+    <label class="field">
+      Tamanho da fonte: <span id="m-font-size-value">48</span> px
+      <input type="range" id="m-font-size" min="24" max="120" value="48" />
+    </label>
+
+    <label class="checkbox">
+      <input type="checkbox" id="m-mirrored" />
+      Espelhar texto
+    </label>
+
+    <p id="status" class="muted"></p>
+  </div>
+
   <script src="/shared/scroll-engine.js"></script>
+  <script src="/shared/mobile-app.js"></script>
+  <script src="/network/ws-transport.js"></script>
   <script src="/network/network.js"></script>
 </body>
 </html>

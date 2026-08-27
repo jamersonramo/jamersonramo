@@ -21,8 +21,12 @@ let activeNetwork = null;
 // Sobe um servidor local (Express + WebSocket) que serve a mesma tela de
 // exibição para qualquer tablet/celular na mesma rede Wi-Fi abrir no
 // navegador — útil para montar um rig de teleprompter com câmera móvel
-// sem precisar de um app nativo separado.
-function startServer(initialState) {
+// sem precisar de um app nativo separado. A conexão é bidirecional: além
+// de receber o estado (broadcastState/broadcastCommand), qualquer cliente
+// pode enviar `{ kind: 'state' | 'command', payload }`, repassado para
+// `onMessage` — assim qualquer tablet/celular conectado pode virar o
+// controle, não só o espelho.
+function startServer(initialState, { onMessage } = {}) {
   return new Promise((resolve, reject) => {
     const app = express();
     app.get('/', (_req, res) => res.redirect('/network/index.html'));
@@ -33,6 +37,14 @@ function startServer(initialState) {
 
     wss.on('connection', (ws) => {
       ws.send(JSON.stringify({ kind: 'state', payload: initialState }));
+      ws.on('message', (data) => {
+        if (!onMessage) return;
+        try {
+          onMessage(JSON.parse(data));
+        } catch (err) {
+          console.error('Mensagem inválida recebida do cliente de rede:', err);
+        }
+      });
     });
 
     server.listen(0, '0.0.0.0', () => {
