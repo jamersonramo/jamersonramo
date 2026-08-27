@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Teleprompter desktop app com espelhamento em segunda tela, controle remoto (pedais/controles Bluetooth tipo teclado) e mirror de rede para tablets/celulares",
+  "author": "jamersonramo",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
@@ -27,6 +28,7 @@
     ],
     "directories": {
       "output": "dist"
-    }
+    },
+    "publish": null
   }
 }
