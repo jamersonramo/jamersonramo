@@ -29,6 +29,15 @@
     "directories": {
       "output": "dist"
     },
-    "publish": null
+    "publish": null,
+    "win": {
+      "target": ["nsis"]
+    },
+    "mac": {
+      "target": ["dmg", "zip"]
+    },
+    "linux": {
+      "target": ["AppImage"]
+    }
   }
 }

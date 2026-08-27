@@ -1,0 +1,40 @@
+name: Build Teleprompter installers
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'teleprompter/**'
+      - '.github/workflows/build-teleprompter.yml'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: teleprompter
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - run: npm run dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: teleprompter-${{ matrix.os }}
+          path: |
+            teleprompter/dist/*.exe
+            teleprompter/dist/*.dmg
+            teleprompter/dist/*.zip
+            teleprompter/dist/*.AppImage
+          if-no-files-found: error
