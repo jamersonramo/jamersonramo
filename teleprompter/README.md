@@ -23,6 +23,10 @@ App desktop de teleprompter (Electron) com:
 - Modo **P2P sem notebook** (`mobile-webrtc/`): página web independente
   que conecta dois celulares/tablets diretamente entre si via WebRTC,
   sem precisar do app desktop rodando. Veja `mobile-webrtc/README.md`.
+- **Servidor standalone** (`server/`): hub de estado sempre ligado,
+  independente do Electron, pra rodar numa máquina da sua escolha (VPS,
+  Raspberry Pi, NAS, PC dedicado) — qualquer dispositivo na rede acessa
+  pelo navegador. Veja `server/README.md`.
 
 ## Requisitos
 
@@ -83,6 +87,7 @@ teleprompter/
         mobile-app.js           UI espelho+controle reaproveitada por network/ e mobile-webrtc/
         remote-control.js      captura/leitura de teclado e Gamepad API (app desktop)
   mobile-webrtc/            página estática independente, P2P entre dois celulares (sem notebook)
+  server/                   servidor standalone (Node.js puro), sempre ligado, sem Electron
 ```
 
 ## Como funciona a sincronização

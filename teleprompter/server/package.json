@@ -1,0 +1,17 @@
+{
+  "name": "teleprompter-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Servidor standalone do Teleprompter — hub de estado sempre ligado, pra rodar em qualquer máquina da rede interna (VPS, Raspberry Pi, NAS, PC dedicado). Sem Electron, sem GUI.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  }
+}
