@@ -1,0 +1,30 @@
+{
+  "name": "teleprompter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Teleprompter desktop app com espelhamento em segunda tela, controle remoto (pedais/controles Bluetooth tipo teclado) e mirror de rede para tablets/celulares",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  },
+  "build": {
+    "appId": "com.jamersonramo.teleprompter",
+    "productName": "Teleprompter",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  }
+}

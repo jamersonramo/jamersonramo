@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teleprompter — Controle</title>
+  <link rel="stylesheet" href="control.css" />
+</head>
+<body>
+  <header>
+    <h1>Teleprompter</h1>
+    <div class="actions">
+      <button id="import-btn">Importar roteiro (.txt)</button>
+      <button id="open-display-btn" class="primary">Abrir tela de exibição</button>
+    </div>
+  </header>
+
+  <main>
+    <textarea id="script" placeholder="Cole ou digite o roteiro aqui..."></textarea>
+
+    <aside class="panel">
+      <div class="transport">
+        <button id="play-btn" class="big">▶ Reproduzir</button>
+        <button id="reset-btn">⏮ Reiniciar</button>
+      </div>
+
+      <label class="field">
+        Velocidade: <span id="speed-value">60</span> px/s
+        <input type="range" id="speed" min="0" max="400" value="60" />
+      </label>
+
+      <label class="field">
+        Tamanho da fonte: <span id="font-size-value">48</span> px
+        <input type="range" id="font-size" min="24" max="120" value="48" />
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" id="mirrored" />
+        Espelhar texto (vidro/beam splitter)
+      </label>
+
+      <section class="network">
+        <label class="checkbox">
+          <input type="checkbox" id="network-toggle" />
+          Mirror de rede (tablet/celular na mesma Wi-Fi)
+        </label>
+        <p id="network-url" class="muted">desativado</p>
+      </section>
+
+      <section class="shortcuts">
+        <h2>Controle remoto (pedal/clicker Bluetooth)</h2>
+        <p class="muted">
+          Funciona como um teclado — basta parear o dispositivo no sistema.
+          Estes atalhos ficam ativos globalmente enquanto a tela de exibição
+          estiver aberta:
+        </p>
+        <ul>
+          <li><kbd>Espaço</kbd> — play / pause</li>
+          <li><kbd>&uarr;</kbd> / <kbd>Page Up</kbd> — aumentar velocidade</li>
+          <li><kbd>&darr;</kbd> / <kbd>Page Down</kbd> — diminuir velocidade</li>
+          <li><kbd>&larr;</kbd> — voltar um trecho</li>
+          <li><kbd>&rarr;</kbd> — avançar um trecho</li>
+          <li><kbd>Shift</kbd>+<kbd>R</kbd> — reiniciar do topo</li>
+          <li><kbd>Shift</kbd>+<kbd>M</kbd> — espelhar</li>
+        </ul>
+      </section>
+    </aside>
+  </main>
+
+  <script src="control.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Teleprompter — Mirror</title>
+  <link rel="stylesheet" href="/display/display.css" />
+  <style>
+    #status {
+      position: fixed;
+      bottom: 8px;
+      right: 12px;
+      color: rgba(255, 255, 255, 0.25);
+      font-family: monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="text-wrap">
+      <p id="text" class="text"></p>
+    </div>
+    <div class="center-line"></div>
+  </div>
+  <div id="status">conectando...</div>
+  <script src="/shared/scroll-engine.js"></script>
+  <script src="/network/network.js"></script>
+</body>
+</html>
