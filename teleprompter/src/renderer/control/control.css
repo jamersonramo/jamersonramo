@@ -144,3 +144,38 @@ kbd {
   padding: 1px 6px;
   font-size: 11px;
 }
+
+.remote-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.remote-table th {
+  text-align: left;
+  color: #8a8fa3;
+  font-weight: 500;
+  padding: 4px 6px;
+}
+
+.remote-table td {
+  padding: 4px 6px;
+  border-top: 1px solid #262a35;
+}
+
+.remote-table button {
+  padding: 4px 8px;
+  font-size: 11px;
+  width: 100%;
+}
+
+.remote-table button.capturing {
+  background: #3d5afe;
+  border-color: #3d5afe;
+}
+
+#reset-bindings-btn {
+  margin-top: 10px;
+  width: 100%;
+}

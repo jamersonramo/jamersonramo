@@ -1,11 +1,15 @@
 const { app, BrowserWindow, screen, ipcMain, globalShortcut, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const mammoth = require('mammoth');
+const pdfParse = require('pdf-parse');
 const { startServer, stopServer, broadcastState, broadcastCommand } = require('./server');
+const { loadSettings, saveSettings, defaultSettings } = require('./settings-store');
 
 let controlWindow = null;
 let displayWindow = null;
 let network = null; // { server, wss, port, url }
+let settings = null; // carregado em app.whenReady()
 
 const state = {
   text: 'Cole ou importe seu roteiro aqui...',
@@ -29,6 +33,24 @@ function sendCommand(cmd) {
   }
   broadcastCommand(cmd);
 }
+
+function broadcastSettings() {
+  for (const win of BrowserWindow.getAllWindows()) {
+    win.webContents.send('settings:sync', settings);
+  }
+}
+
+// Handlers das ações de controle remoto, compartilhados entre os atalhos
+// globais de teclado e os botões de controle de videogame configurados.
+const remoteActions = {
+  playPause: () => broadcastAll({ playing: !state.playing }),
+  speedUp: () => broadcastAll({ speed: Math.min(400, state.speed + 10) }),
+  speedDown: () => broadcastAll({ speed: Math.max(0, state.speed - 10) }),
+  nudgeBack: () => sendCommand({ type: 'nudge', delta: -200 }),
+  nudgeForward: () => sendCommand({ type: 'nudge', delta: 200 }),
+  reset: () => sendCommand({ type: 'reset' }),
+  mirror: () => broadcastAll({ mirrored: !state.mirrored }),
+};
 
 function createControlWindow() {
   controlWindow = new BrowserWindow({
@@ -95,21 +117,12 @@ function closeDisplayWindow() {
 // câmera no celular/tablet), o que é essencial para pedais e controles
 // remotos Bluetooth que emulam um teclado. Só ficam ativos durante a
 // apresentação para não atrapalhar a digitação do roteiro no controle.
+// Os atalhos em si são configuráveis pelo usuário (ver settings-store.js).
 function registerPresentationShortcuts() {
-  const bindings = {
-    Space: () => broadcastAll({ playing: !state.playing }),
-    Up: () => broadcastAll({ speed: Math.min(400, state.speed + 10) }),
-    PageUp: () => broadcastAll({ speed: Math.min(400, state.speed + 10) }),
-    Down: () => broadcastAll({ speed: Math.max(0, state.speed - 10) }),
-    PageDown: () => broadcastAll({ speed: Math.max(0, state.speed - 10) }),
-    Left: () => sendCommand({ type: 'nudge', delta: -200 }),
-    Right: () => sendCommand({ type: 'nudge', delta: 200 }),
-    'Shift+R': () => sendCommand({ type: 'reset' }),
-    'Shift+M': () => broadcastAll({ mirrored: !state.mirrored }),
-  };
-  for (const [accelerator, handler] of Object.entries(bindings)) {
+  for (const [action, accelerator] of Object.entries(settings.keybindings)) {
+    if (!accelerator || !remoteActions[action]) continue;
     try {
-      globalShortcut.register(accelerator, handler);
+      globalShortcut.register(accelerator, remoteActions[action]);
     } catch (err) {
       console.error(`Falha ao registrar atalho ${accelerator}:`, err);
     }
@@ -121,6 +134,7 @@ function unregisterPresentationShortcuts() {
 }
 
 app.whenReady().then(() => {
+  settings = loadSettings();
   createControlWindow();
 
   app.on('activate', () => {
@@ -155,13 +169,56 @@ ipcMain.handle('file:import', async () => {
   const win = BrowserWindow.getFocusedWindow();
   const result = await dialog.showOpenDialog(win, {
     title: 'Importar roteiro',
-    filters: [{ name: 'Texto', extensions: ['txt', 'md'] }],
+    filters: [{ name: 'Roteiro', extensions: ['txt', 'md', 'pdf', 'docx'] }],
     properties: ['openFile'],
   });
   if (result.canceled || result.filePaths.length === 0) return null;
+
   const filePath = result.filePaths[0];
-  const text = fs.readFileSync(filePath, 'utf8');
-  return { text, name: path.basename(filePath) };
+  const ext = path.extname(filePath).toLowerCase();
+
+  try {
+    let text;
+    if (ext === '.pdf') {
+      const buffer = fs.readFileSync(filePath);
+      text = (await pdfParse(buffer)).text;
+    } else if (ext === '.docx') {
+      text = (await mammoth.extractRawText({ path: filePath })).value;
+    } else {
+      text = fs.readFileSync(filePath, 'utf8');
+    }
+    return { text, name: path.basename(filePath) };
+  } catch (err) {
+    dialog.showErrorBox('Erro ao importar roteiro', `Não foi possível ler o arquivo:\n${err.message}`);
+    return null;
+  }
+});
+
+ipcMain.handle('settings:get', () => settings);
+
+ipcMain.handle('settings:set', (_event, partial) => {
+  settings = {
+    keybindings: { ...settings.keybindings, ...(partial.keybindings || {}) },
+    gamepadBindings: { ...settings.gamepadBindings, ...(partial.gamepadBindings || {}) },
+  };
+  saveSettings(settings);
+  broadcastSettings();
+  if (displayWindow) {
+    unregisterPresentationShortcuts();
+    registerPresentationShortcuts();
+  }
+  return settings;
+});
+
+ipcMain.handle('settings:reset', () => {
+  settings = defaultSettings();
+  saveSettings(settings);
+  broadcastSettings();
+  if (displayWindow) {
+    unregisterPresentationShortcuts();
+    registerPresentationShortcuts();
+  }
+  return settings;
 });
 
 ipcMain.handle('network:toggle', async (_event, enable) => {

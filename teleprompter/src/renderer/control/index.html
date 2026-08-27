@@ -9,7 +9,7 @@
   <header>
     <h1>Teleprompter</h1>
     <div class="actions">
-      <button id="import-btn">Importar roteiro (.txt)</button>
+      <button id="import-btn">Importar roteiro (.txt, .md, .pdf, .docx)</button>
       <button id="open-display-btn" class="primary">Abrir tela de exibição</button>
     </div>
   </header>
@@ -47,25 +47,31 @@
       </section>
 
       <section class="shortcuts">
-        <h2>Controle remoto (pedal/clicker Bluetooth)</h2>
+        <h2>Controle remoto</h2>
         <p class="muted">
-          Funciona como um teclado — basta parear o dispositivo no sistema.
-          Estes atalhos ficam ativos globalmente enquanto a tela de exibição
-          estiver aberta:
+          Pedais/clickers Bluetooth funcionam como um teclado comum — basta
+          parear no sistema. Controles PlayStation/Xbox (USB ou Bluetooth)
+          também são reconhecidos automaticamente. Clique em "Definir" e
+          pressione a tecla ou o botão desejado para vincular a cada ação.
+          Os atalhos de teclado ficam ativos globalmente (mesmo com outro
+          app em foco) enquanto a tela de exibição estiver aberta.
         </p>
-        <ul>
-          <li><kbd>Espaço</kbd> — play / pause</li>
-          <li><kbd>&uarr;</kbd> / <kbd>Page Up</kbd> — aumentar velocidade</li>
-          <li><kbd>&darr;</kbd> / <kbd>Page Down</kbd> — diminuir velocidade</li>
-          <li><kbd>&larr;</kbd> — voltar um trecho</li>
-          <li><kbd>&rarr;</kbd> — avançar um trecho</li>
-          <li><kbd>Shift</kbd>+<kbd>R</kbd> — reiniciar do topo</li>
-          <li><kbd>Shift</kbd>+<kbd>M</kbd> — espelhar</li>
-        </ul>
+        <table id="remote-table" class="remote-table">
+          <thead>
+            <tr>
+              <th>Ação</th>
+              <th>Teclado</th>
+              <th>Controle</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <button id="reset-bindings-btn">Restaurar padrões</button>
       </section>
     </aside>
   </main>
 
+  <script src="../shared/remote-control.js"></script>
   <script src="control.js"></script>
 </body>
 </html>

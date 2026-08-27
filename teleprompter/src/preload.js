@@ -8,10 +8,16 @@ contextBridge.exposeInMainWorld('teleprompter', {
   importFile: () => ipcRenderer.invoke('file:import'),
   toggleNetwork: (enable) => ipcRenderer.invoke('network:toggle', enable),
   networkStatus: () => ipcRenderer.invoke('network:status'),
+  getSettings: () => ipcRenderer.invoke('settings:get'),
+  setSettings: (partial) => ipcRenderer.invoke('settings:set', partial),
+  resetSettings: () => ipcRenderer.invoke('settings:reset'),
   onStateSync: (callback) => {
     ipcRenderer.on('state:sync', (_event, state) => callback(state));
   },
   onCommand: (callback) => {
     ipcRenderer.on('scroll:command', (_event, cmd) => callback(cmd));
+  },
+  onSettingsSync: (callback) => {
+    ipcRenderer.on('settings:sync', (_event, settings) => callback(settings));
   },
 });
